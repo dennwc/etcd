@@ -510,3 +510,44 @@ func TestLeaseTimeToLive(t *testing.T) {
 		t.Fatalf("unexpected keys %+v", lresp.Keys)
 	}
 }
+
+// TestLeaseRenewLostLeader ensures keepalives work after losing the leader
+// for a while.
+func TestLeaseRenewLostLeader(t *testing.T) {
+	defer testutil.AfterTest(t)
+
+	clus := integration.NewClusterV3(t, &integration.ClusterConfig{Size: 3})
+	defer clus.Terminate(t)
+
+	cli := clus.Client(0)
+	r, err := cli.Grant(context.TODO(), 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	kctx, kcancel := context.WithCancel(context.Background())
+	defer kcancel()
+	ka, err := cli.KeepAlive(kctx, r.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// consume first keepalive so next message sends when cluster is down
+	<-ka
+
+	// force keepalive stream message to timeout
+	clus.Members[1].Stop(t)
+	clus.Members[2].Stop(t)
+	// since leader is lost, grace period is extended
+	time.Sleep(time.Duration(r.TTL) * time.Second)
+	clus.Members[1].Restart(t)
+	clus.Members[2].Restart(t)
+
+	select {
+	case _, ok := <-ka:
+		if !ok {
+			t.Fatalf("keepalive closed")
+		}
+	case <-time.After(time.Duration(r.TTL) * time.Second):
+		t.Fatalf("timed out waiting for keepalive")
+	}
+}

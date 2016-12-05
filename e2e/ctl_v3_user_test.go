@@ -1,4 +1,4 @@
-// Copyright 2016 CoreOS, Inc.
+// Copyright 2016 The etcd Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,18 @@ func userAddTest(cx ctlCtx) {
 			args:        []string{"add", "username", "--interactive=false"},
 			expectedStr: "User username created",
 			stdIn:       []string{"password"},
+		},
+		// Adds a user name using the usertest:password syntax.
+		{
+			args:        []string{"add", "usertest:password"},
+			expectedStr: "User usertest created",
+			stdIn:       []string{},
+		},
+		// Tries to add a user with empty username.
+		{
+			args:        []string{"add", ":password"},
+			expectedStr: "empty user name is not allowed.",
+			stdIn:       []string{},
 		},
 		// Tries to add a user name that already exists.
 		{

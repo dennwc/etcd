@@ -1,4 +1,4 @@
-// Copyright 2016 CoreOS, Inc.
+// Copyright 2016 The etcd Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ func defragTest(cx ctlCtx) {
 		}
 	}
 
-	if err := ctlV3Compact(cx, 4); err != nil {
+	if err := ctlV3Compact(cx, 4, cx.compactPhysical); err != nil {
 		cx.t.Fatal(err)
 	}
 

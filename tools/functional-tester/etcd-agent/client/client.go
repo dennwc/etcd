@@ -1,4 +1,4 @@
-// Copyright 2015 CoreOS, Inc.
+// Copyright 2015 The etcd Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@ package client
 import "net/rpc"
 
 type Status struct {
+	// State gives the human-readable status of an agent (e.g., "started" or "terminated")
+	State string
+
 	// TODO: gather more informations
 	// TODO: memory usage, raft information, etc..
-	State string
 }
 
 type Agent interface {

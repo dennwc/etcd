@@ -1,4 +1,4 @@
-// Copyright 2016 CoreOS, Inc.
+// Copyright 2016 The etcd Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,4 +48,21 @@ func ExampleMaintenance_status() {
 	// endpoint: localhost:2379 / IsLeader: false
 	// endpoint: localhost:22379 / IsLeader: false
 	// endpoint: localhost:32379 / IsLeader: true
+}
+
+func ExampleMaintenance_defragment() {
+	for _, ep := range endpoints {
+		cli, err := clientv3.New(clientv3.Config{
+			Endpoints:   []string{ep},
+			DialTimeout: dialTimeout,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cli.Close()
+
+		if _, err = cli.Defragment(context.TODO(), ep); err != nil {
+			log.Fatal(err)
+		}
+	}
 }

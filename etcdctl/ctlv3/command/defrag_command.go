@@ -1,4 +1,4 @@
-// Copyright 2016 CoreOS, Inc.
+// Copyright 2016 The etcd Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import (
 func NewDefragCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "defrag",
-		Short: "defrag defragments the storage of the etcd members with given endpoints.",
+		Short: "Defragments the storage of the etcd members with given endpoints",
 		Run:   defragCommandFunc,
 	}
 }

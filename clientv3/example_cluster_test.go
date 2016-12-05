@@ -1,4 +1,4 @@
-// Copyright 2016 CoreOS, Inc.
+// Copyright 2016 The etcd Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ func ExampleCluster_memberList() {
 		log.Fatal(err)
 	}
 	fmt.Println("members:", len(resp.Members))
-	// members: 3
+	// Output: members: 3
 }
 
 func ExampleCluster_memberAdd() {

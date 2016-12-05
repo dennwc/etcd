@@ -1,4 +1,4 @@
-# Libraries and Tools
+# Libraries and tools
 
 **Tools**
 
@@ -17,11 +17,13 @@
 
 **Go libraries**
 
-- [etcd/client](https://github.com/coreos/etcd/blob/master/client) - the officially maintained Go client
+- [etcd/clientv3](https://github.com/coreos/etcd/blob/master/clientv3) - the officially maintained Go client for v3
+- [etcd/client](https://github.com/coreos/etcd/blob/master/client) - the officially maintained Go client for v2
 - [go-etcd](https://github.com/coreos/go-etcd) - the deprecated official client. May be useful for older (<2.0.0) versions of etcd.
 
 **Java libraries**
 
+- [coreos/jetcd](https://github.com/coreos/jetcd) - Supports v3
 - [boonproject/etcd](https://github.com/boonproject/boon/blob/master/etcd/README.md) - Supports v2, Async/Sync and waits
 - [justinsb/jetcd](https://github.com/justinsb/jetcd)
 - [diwakergupta/jetcd](https://github.com/diwakergupta/jetcd) - Supports v2
@@ -29,8 +31,13 @@
 - [AdoHe/etcd4j](http://github.com/AdoHe/etcd4j) - Supports v2 (enhance for real production cluster)
 - [cdancy/etcd-rest](https://github.com/cdancy/etcd-rest) - Uses jclouds to provide a complete implementation of v2 API.
 
+**Scala libraries**
+
+- [maciej/etcd-client](https://github.com/maciej/etcd-client) - Supports v2. Akka HTTP-based fully async client
+
 **Python libraries**
 
+- [kragniz/python-etcd3](https://github.com/kragniz/python-etcd3) - Work in progress client for v3
 - [jplana/python-etcd](https://github.com/jplana/python-etcd) - Supports v2
 - [russellhaering/txetcd](https://github.com/russellhaering/txetcd) - a Twisted Python library
 - [cholcombe973/autodock](https://github.com/cholcombe973/autodock) - A docker deployment automation tool
@@ -56,6 +63,8 @@
 **C++ libraries**
 - [edwardcapriolo/etcdcpp](https://github.com/edwardcapriolo/etcdcpp) - Supports v2
 - [suryanathan/etcdcpp](https://github.com/suryanathan/etcdcpp) - Supports v2 (with waits)
+- [nokia/etcd-cpp-api](https://github.com/nokia/etcd-cpp-api) - Supports v2
+- [nokia/etcd-cpp-apiv3](https://github.com/nokia/etcd-cpp-apiv3) - Supports v3
 
 **Clojure libraries**
 
@@ -75,6 +84,7 @@
 **PHP Libraries**
 
 - [linkorb/etcd-php](https://github.com/linkorb/etcd-php)
+- [activecollab/etcd](https://github.com/activecollab/etcd) 
 
 **Haskell libraries**
 
@@ -84,9 +94,17 @@
 
 - [ropensci/etseed](https://github.com/ropensci/etseed)
 
+**Nim libraries**
+
+- [etcd_client](https://github.com/FedericoCeratto/nim-etcd-client)
+
 **Tcl libraries**
 
 - [efrecon/etcd-tcl](https://github.com/efrecon/etcd-tcl) - Supports v2, except wait.
+
+**Gradle Plugins**
+
+- [gradle-etcd-rest-plugin](https://github.com/cdancy/gradle-etcd-rest-plugin) - Supports v2
 
 **Chef Integration**
 
@@ -123,3 +141,4 @@
 - [spf13/viper](https://github.com/spf13/viper) - Go configuration library, reads values from ENV, pflags, files, and etcd with optional encryption
 - [lytics/metafora](https://github.com/lytics/metafora) - Go distributed task library
 - [ryandoyle/nss-etcd](https://github.com/ryandoyle/nss-etcd) - A GNU libc NSS module for resolving names from etcd.
+- [Gru](https://github.com/dnaeon/gru) - Orchestration made easy with Go

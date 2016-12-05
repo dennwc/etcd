@@ -1,4 +1,4 @@
-// Copyright 2015 CoreOS, Inc.
+// Copyright 2015 The etcd Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"golang.org/x/net/http2"
 )
 
 const (
@@ -42,6 +44,14 @@ type GetProxyURLs func() []string
 // which will proxy requests to an etcd cluster.
 // The handler will periodically update its view of the cluster.
 func NewHandler(t *http.Transport, urlsFunc GetProxyURLs, failureWait time.Duration, refreshInterval time.Duration) http.Handler {
+	if t.TLSClientConfig != nil {
+		// Enable http2, see Issue 5033.
+		err := http2.ConfigureTransport(t)
+		if err != nil {
+			plog.Infof("Error enabling Transport HTTP/2 support: %v", err)
+		}
+	}
+
 	p := &reverseProxy{
 		director:  newDirector(urlsFunc, failureWait, refreshInterval),
 		transport: t,

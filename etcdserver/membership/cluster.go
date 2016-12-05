@@ -1,4 +1,4 @@
-// Copyright 2015 CoreOS, Inc.
+// Copyright 2015 The etcd Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/coreos/etcd/mvcc/backend"
 	"github.com/coreos/etcd/pkg/netutil"
 	"github.com/coreos/etcd/pkg/types"
 	"github.com/coreos/etcd/raft"
 	"github.com/coreos/etcd/raft/raftpb"
-	"github.com/coreos/etcd/storage/backend"
 	"github.com/coreos/etcd/store"
 	"github.com/coreos/etcd/version"
 	"github.com/coreos/go-semver/semver"
@@ -200,13 +200,14 @@ func (c *RaftCluster) SetBackend(be backend.Backend) {
 	mustCreateBackendBuckets(c.be)
 }
 
-func (c *RaftCluster) Recover() {
+func (c *RaftCluster) Recover(onSet func(*semver.Version)) {
 	c.Lock()
 	defer c.Unlock()
 
 	c.members, c.removed = membersFromStore(c.store)
 	c.version = clusterVersionFromStore(c.store)
 	mustDetectDowngrade(c.version)
+	onSet(c.version)
 
 	for _, m := range c.members {
 		plog.Infof("added member %s %v to cluster %s from store", m.ID, m.PeerURLs, c.id)
@@ -290,6 +291,8 @@ func (c *RaftCluster) AddMember(m *Member) {
 	}
 
 	c.members[m.ID] = m
+
+	plog.Infof("added member %s %v to cluster %s", m.ID, m.PeerURLs, c.id)
 }
 
 // RemoveMember removes a member from the store.
@@ -306,6 +309,8 @@ func (c *RaftCluster) RemoveMember(id types.ID) {
 
 	delete(c.members, id)
 	c.removed[id] = true
+
+	plog.Infof("removed member %s from cluster %s", id, c.id)
 }
 
 func (c *RaftCluster) UpdateAttributes(id types.ID, attr Attributes) {
@@ -339,6 +344,8 @@ func (c *RaftCluster) UpdateRaftAttributes(id types.ID, raftAttr RaftAttributes)
 	if c.be != nil {
 		mustSaveMemberToBackend(c.be, c.members[id])
 	}
+
+	plog.Noticef("updated member %s %v in cluster %s", id, raftAttr.PeerURLs, c.id)
 }
 
 func (c *RaftCluster) Version() *semver.Version {
@@ -350,7 +357,7 @@ func (c *RaftCluster) Version() *semver.Version {
 	return semver.Must(semver.NewVersion(c.version.String()))
 }
 
-func (c *RaftCluster) SetVersion(ver *semver.Version) {
+func (c *RaftCluster) SetVersion(ver *semver.Version, onSet func(*semver.Version)) {
 	c.Lock()
 	defer c.Unlock()
 	if c.version != nil {
@@ -366,6 +373,7 @@ func (c *RaftCluster) SetVersion(ver *semver.Version) {
 	if c.be != nil {
 		mustSaveClusterVersionToBackend(c.be, ver)
 	}
+	onSet(ver)
 }
 
 func (c *RaftCluster) IsReadyToAddNewMember() bool {
@@ -381,7 +389,7 @@ func (c *RaftCluster) IsReadyToAddNewMember() bool {
 
 	if nstarted == 1 && nmembers == 2 {
 		// a case of adding a new node to 1-member cluster for restoring cluster data
-		// https://github.com/coreos/etcd/blob/master/Documentation/admin_guide.md#restoring-the-cluster
+		// https://github.com/coreos/etcd/blob/master/Documentation/v2/admin_guide.md#restoring-the-cluster
 
 		plog.Debugf("The number of started member is 1. This cluster can accept add member request.")
 		return true

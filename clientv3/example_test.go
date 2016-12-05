@@ -1,4 +1,4 @@
-// Copyright 2016 CoreOS, Inc.
+// Copyright 2016 The etcd Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import (
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
+	"github.com/coreos/etcd/pkg/transport"
+	"github.com/coreos/pkg/capnslog"
 	"golang.org/x/net/context"
 )
 
@@ -29,9 +31,38 @@ var (
 )
 
 func Example() {
+	var plog = capnslog.NewPackageLogger("github.com/coreos/etcd", "clientv3")
+	clientv3.SetLogger(plog)
+
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   endpoints,
 		DialTimeout: dialTimeout,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cli.Close() // make sure to close the client
+
+	_, err = cli.Put(context.TODO(), "foo", "bar")
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleConfig_withTLS() {
+	tlsInfo := transport.TLSInfo{
+		CertFile:      "/tmp/test-certs/test-name-1.pem",
+		KeyFile:       "/tmp/test-certs/test-name-1-key.pem",
+		TrustedCAFile: "/tmp/test-certs/trusted-ca.pem",
+	}
+	tlsConfig, err := tlsInfo.ClientConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   endpoints,
+		DialTimeout: dialTimeout,
+		TLS:         tlsConfig,
 	})
 	if err != nil {
 		log.Fatal(err)

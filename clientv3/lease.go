@@ -15,6 +15,7 @@
 package clientv3
 
 import (
+	"errors"
 	"sync"
 	"time"
 
@@ -149,6 +150,13 @@ func (l *lessor) KeepAlive(ctx context.Context, id LeaseID) (<-chan *LeaseKeepAl
 	ch := make(chan *LeaseKeepAliveResponse, leaseResponseChSize)
 
 	l.mu.Lock()
+	// ensure that recvKeepAliveLoop is still running
+	select {
+	case <-l.donec:
+		l.mu.Unlock()
+		return nil, errors.New("keep alive loop exited")
+	default:
+	}
 	ka, ok := l.keepAlives[id]
 	if !ok {
 		// create fresh keep alive
